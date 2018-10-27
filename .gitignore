@@ -29,3 +29,6 @@ Temporary Items
 # Files specifically for node function
 node_modules
 .env
+
+# Listing file
+.xlsx
