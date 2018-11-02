@@ -1,5 +1,7 @@
 var inquirer = require("inquirer")
 var mysql = require("mysql");
+var Table = require("cli-table3");
+var colors = require("colors")
 
 var connection = mysql.createConnection({
   host: "localhost",
@@ -25,16 +27,33 @@ var lowLimit = 5;
 function readItems() {
     // get all product info for display
     connection.query("SELECT * FROM items", function(err, res) {
-        if (err) throw err
-        console.table(res)
+        if (err) throw err;
+        var table = new Table({head:[colors.green('ID'), colors.green('Product'), colors.green('Department'), colors.green('Price'), colors.green('Quantity')]})
+        for (i = 0; i < res.length; i++) {
+            var row  = [];
+            row.push(colors.blue(res[i]['id']));
+            row.push(res[i]['product_name']);
+            row.push(res[i]['department_name']);
+            row.push(colors.magenta(res[i]['price']));
+            row.push(colors.yellow(res[i]['stock_quantity']));
+            table.push(row);
+        }
+        console.log(table.toString());
         promptAgain();
     });
 }
 function readLow() {
     // get low items for display
     connection.query("SELECT product_name, stock_quantity FROM items WHERE stock_quantity < " + lowLimit, function(err, res) {
-        if (err) throw err
-        console.table(res)
+        if (err) throw err;
+        var table = new Table({head:[colors.green('Product'), colors.green('Quantity')], style:{head:[]}})
+        for (i = 0; i < res.length; i++) {
+            var row  = [];
+            row.push(res[i]['product_name']);
+            row.push(colors.yellow(res[i]['stock_quantity']));
+            table.push(row);
+        }
+        console.log(table.toString());
         promptAgain();
     });
 }
