@@ -108,6 +108,7 @@ function promptNumber() {
           return true
         }
         else {
+          console.log(colors.red('\nThat is not a valid number.'))
           return false
         }
       }
@@ -115,7 +116,7 @@ function promptNumber() {
   ]).then(function(res) {
     purchaseQuantity = parseInt(res.pquantity);
     if (purchaseQuantity > stockQuantity) {
-      console.log("Insufficient quantity, only ", stockQuantity, " in stock.")
+      console.log(colors.red("Insufficient quantity, only ", colors.yellow(stockQuantity), " in stock."));
       promptNumber();
     }
     else {
@@ -137,7 +138,7 @@ function promptConfirmPurchase(pquantity, item) {
       updateQuantity(item, pquantity);
     }
     else {
-      console.log("I'm sorry. ")
+      console.log(colors.magenta("I'm sorry. "));
     }
     promptConfirmStartOver();
   });

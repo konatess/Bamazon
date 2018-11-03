@@ -96,7 +96,7 @@ function updateQuantity(item, newQuantity) {
     connection.query('UPDATE bamazonDB.items SET stock_quantity = "' + newQuantity + '" WHERE product_name = "' + item + '"', function(err, res) {
         if (err) throw err
         else {
-            console.log("You now have ", newQuantity, " of ", item, " in stock.")
+            console.log("You now have ", colors.green(newQuantity), " of ", colors.green(item), " in stock.")
         }
         promptAgain();
     });
@@ -196,7 +196,7 @@ function promptAddProd(dep) {
             message: 'Please enter the name of the item: ',
             validate: function (input) {
                 if (input.length < 5) {
-                    console.log("\nItem name must be at least 5 characters")
+                    console.log(colors.red("\nItem name must be at least 5 characters"));
                     return false
                 }
                 else {
@@ -213,7 +213,7 @@ function promptAddProd(dep) {
                     return true
                 }
                 else {
-                    console.log('\nThat is not a valid number. Please try again. ')
+                    console.log(colors.red('\nThat is not a valid number. Please try again. '));
                     return false
                 }
             }
@@ -227,7 +227,7 @@ function promptAddProd(dep) {
                     return true
                 }
                 else {
-                    console.log('\nThat is not a valid number. Please try again. ')
+                    console.log(colors.red('\nThat is not a valid number. Please try again. '));
                     return false
                 }
             }
