@@ -1,5 +1,6 @@
 var inquirer = require("inquirer")
 var mysql = require("mysql");
+var colors = require("colors");
 
 var connection = mysql.createConnection({
   host: "localhost",
@@ -15,7 +16,6 @@ var connection = mysql.createConnection({
 
 connection.connect(function(err) {
   if (err) throw err;
-  console.log("connected as id " + connection.threadId + "\n");
   readDepartments();
 });
 
@@ -30,10 +30,8 @@ function readDepartments() {
   connection.query("SELECT DISTINCT department_name FROM items ", function(err, res) {
     var departments = ["Search All Departments"]
     if (err) throw err;
-    console.log(res.length);
     for (i = 0; i < res.length; i++) {
-      console.log(res[i]['department_name'])
-      departments.push(res[i]['department_name'])
+      departments.push(res[i]['department_name']);
     }
     promptDepartments(departments);
   });
@@ -81,7 +79,7 @@ function promptDepartments(depArr) {
       readItems(where);
     }
     else {
-      var where = "WHERE department_name = '" + depart + "'"
+      var where = "WHERE department_name = '" + depart + "' AND stock_quantity > 0"
       readItems(where);
     }
   })
@@ -130,12 +128,12 @@ function promptConfirmPurchase(pquantity, item) {
     {
       type: 'confirm',
       name: 'confirmPurchase',
-      message: 'Please confirm your choice -- item: ' + item + ' quantity: ' + pquantity + "\n This will cost " + price * pquantity + " magic beans. ", 
+      message: 'Please confirm your choice -- item: ' + colors.green(item) + ' quantity: ' + colors.green(pquantity) + "\n This will cost " + colors.yellow(price * pquantity) + " magic beans. ", 
       default: true
     }
   ]).then(function(input) {
     if (input.confirmPurchase) {
-      console.log("Thank you for your purchase! ")
+      console.log(colors.rainbow("Thank you for your purchase! "));
       updateQuantity(item, pquantity);
     }
     else {
@@ -157,7 +155,7 @@ function promptConfirmStartOver() {
       readDepartments();
     }
     else {
-    console.log('Have a nice day!');
+    console.log(colors.rainbow('Have a wonderful day!'));
     connection.end();
     }
   });

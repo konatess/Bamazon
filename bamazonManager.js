@@ -1,7 +1,7 @@
 var inquirer = require("inquirer")
 var mysql = require("mysql");
 var Table = require("cli-table3");
-var colors = require("colors")
+var colors = require("colors");
 
 var connection = mysql.createConnection({
   host: "localhost",
@@ -17,7 +17,6 @@ var connection = mysql.createConnection({
 
 connection.connect(function(err) {
   if (err) throw err;
-  console.log("connected as id " + connection.threadId + "\n");
   promptMenu();
 });
 // VARIABLES: 
@@ -102,6 +101,18 @@ function updateQuantity(item, newQuantity) {
         promptAgain();
     });
 }
+function checkProduct(name, department, price, quantity){
+    connection.query('SELECT * FROM bamazonDB.items WHERE product_name = "' + name + '"', function(err, res) {
+        if (err) throw err
+        if (res[0] == undefined) {
+            addProduct(name, department, price, quantity);
+        }
+        else {
+            console.log(colors.red('\nItem already exists'));
+            promptAgain();
+        }
+    })
+}
 function addProduct(name, department, price, quantity) {
     // add completely new product to the inventory
     connection.query('INSERT INTO bamazonDB.items (product_name, department_name, price, stock_quantity) VALUES ("' + name + '", "' + department + '", "' +  price + '", "' + quantity + '")', function(err, res) {
@@ -131,7 +142,6 @@ function promptMenu() {
         }
       ]).then(function(input) {
         var choice = input.menu;
-        console.log(choice);
         if (choice === "View Products for Sale") {
             readItems();
         } else if (choice === "View Low Inventory") {
@@ -167,8 +177,7 @@ function promptAddInv(list) {
         }
     ]).then(function(input) {
         itemName = input.item
-        addQuantity = input.quantity
-        console.log("item: ", itemName, " quantity: ", addQuantity)
+        addQuantity = parseInt(input.quantity)
         readBaseQ(itemName, addQuantity);
     })
 };
@@ -187,7 +196,7 @@ function promptAddProd(dep) {
             message: 'Please enter the name of the item: ',
             validate: function (input) {
                 if (input.length < 5) {
-                    console.log("Item name must be at least 5 characters")
+                    console.log("\nItem name must be at least 5 characters")
                     return false
                 }
                 else {
@@ -204,7 +213,7 @@ function promptAddProd(dep) {
                     return true
                 }
                 else {
-                    console.log('That is not a valid number. Please try again. ')
+                    console.log('\nThat is not a valid number. Please try again. ')
                     return false
                 }
             }
@@ -218,18 +227,18 @@ function promptAddProd(dep) {
                     return true
                 }
                 else {
-                    console.log('That is not a valid number. Please try again. ')
+                    console.log('\nThat is not a valid number. Please try again. ')
                     return false
                 }
             }
         }
     ]).then(function(input) {
-        itemName = input.name;
+        itemName = input.name.trim();
         addQuantity = input.quantity;
         var depart = input.department;
         var price = input.price;
         // pass info to add product database function
-        addProduct(itemName, depart, price, addQuantity);
+        checkProduct(itemName, depart, price, addQuantity);
     })
 };
 function promptAgain() {
@@ -246,7 +255,7 @@ function promptAgain() {
           promptMenu();
         }
         else {
-        console.log('Have a nice day!');
+        console.log(colors.rainbow('Have a nice day!'));
         connection.end();
         }
       });
